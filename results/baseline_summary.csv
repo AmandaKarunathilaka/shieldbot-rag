@@ -1,0 +1,2 @@
+system,hit_rate@5,mrr,avg_correctness,guardrail_pass_rate,questions_leaking_internal,questions_using_superseded,n_questions,n_retrieval_questions
+baseline,100.0,0.889,4.3,33.3,5,4,20,18
