@@ -1,0 +1,23 @@
+# Python / uv
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+
+# Copyrighted course material (Noob Dev) - never upload
+data/
+
+# Generated files
+storage/*
+!storage/.gitkeep
+logs/*
+!logs/.gitkeep
+.gradio/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

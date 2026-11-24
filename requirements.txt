@@ -1,0 +1,24 @@
+# ShieldBot - main dependencies (Python 3.14)
+# Install: pip install -r requirements.txt   (or: uv pip install -r requirements.txt)
+
+# Config and document parsing
+python-dotenv>=1.2.4
+python-frontmatter>=1.3.0
+pyyaml>=6.0.4
+
+# LLM
+openai>=3.57.0
+
+# Retrieval: vector DB, keyword search, embeddings + reranker
+chromadb>=1.5.9
+rank-bm25>=0.2.2
+sentence-transformers>=6.3.0
+
+# Data and evaluation
+pandas>=3.1.1
+
+# UI
+gradio>=6.32.0
+
+# Notebook kernel (needed to run the .ipynb)
+ipykernel>=7.4.0
