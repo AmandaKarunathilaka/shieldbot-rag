@@ -7,6 +7,7 @@ Any system works here if it has:
 
 Metrics
     Hit Rate @ k : % of questions where an expected source file is in the top-k chunks
+    Full recall@k: % of questions where ALL expected files are in the top-k (multi-doc questions)
     MRR          : mean of 1 / rank of the first correct chunk (0 if not found)
     Correctness  : LLM-as-a-judge score 1-5 against the expected answer
     Guardrail    : % of guardrail questions handled correctly
@@ -51,8 +52,9 @@ def parse_sources(cell) -> list[str]:
     """'a.md; 02_health/b.md' -> ['a.md', 'b.md'] (file names only)."""
     if cell is None or (isinstance(cell, float) and pd.isna(cell)):
         return []
-    parts = re.split(r"[;,|\n]", str(cell))
-    return [Path(p.strip()).name for p in parts if p.strip() and p.strip().lower() not in {"none", "n/a", "-"}]
+    text = re.sub(r"\(.*?\)", "", str(cell))  # drop notes like "(internal)"
+    parts = [p.strip() for p in re.split(r"[;,|\n]", text)]
+    return [Path(p).name for p in parts if p and p.lower() not in {"none", "n/a", "-"}]
 
 
 def load_eval_set(path: Path) -> pd.DataFrame:
@@ -116,6 +118,8 @@ def run_evaluation(system, eval_df: pd.DataFrame, k: int = 5) -> pd.DataFrame:
         chunks = result["chunks"][:k]
 
         rank = first_hit_rank(chunks, q["expected_files"])
+        retrieved = {c["metadata"]["source_file"] for c in chunks}
+        all_found = set(q["expected_files"]) <= retrieved
         counts_for_retrieval = q["id"] not in NO_RETRIEVAL_IDS and bool(q["expected_files"])
         leaked = any(c["metadata"].get("audience") == "internal" for c in chunks)
         used_superseded = any(c["metadata"].get("status") == "superseded" for c in chunks)
@@ -131,6 +135,7 @@ def run_evaluation(system, eval_df: pd.DataFrame, k: int = 5) -> pd.DataFrame:
             "hit": (rank is not None) if counts_for_retrieval else None,
             "rank": rank if counts_for_retrieval else None,
             "reciprocal_rank": (1 / rank if rank else 0.0) if counts_for_retrieval else None,
+            "all_found": all_found if counts_for_retrieval else None,
             "leaked_internal": leaked,
             "used_superseded": used_superseded,
             "answer": result["answer"],
@@ -153,6 +158,7 @@ def summarise(results: pd.DataFrame, k: int = 5) -> dict:
         "system": results["system"].iloc[0],
         f"hit_rate@{k}": round(float(retr["hit"].astype(bool).mean()) * 100, 1),
         "mrr": round(float(retr["reciprocal_rank"].astype(float).mean()), 3),
+        f"full_recall@{k}": round(float(retr["all_found"].astype(bool).mean()) * 100, 1),
         "avg_correctness": round(float(results["score"].mean()), 2),
         "guardrail_pass_rate": round(float(guard["guardrail_pass"].astype(bool).mean()) * 100, 1),
         "questions_leaking_internal": int(results["leaked_internal"].sum()),
