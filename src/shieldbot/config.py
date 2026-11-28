@@ -36,7 +36,7 @@ CHUNK_SIZE = 1000          # characters; a table is never cut, even if it is lon
 BUILDS_TO_KEEP = 2         # the newest build is used, the one before it is a backup
 
 # ---------- Chatbot (Notebook 2) ----------
-CHAT_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+CHAT_MODEL = os.getenv("LLM_MODEL", "gpt-5.4-mini")
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL") or None   # empty -> OpenAI default
 
 # ---------- Chatbot search settings (Notebook 2) ----------

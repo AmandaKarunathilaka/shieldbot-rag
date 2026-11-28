@@ -1,5 +1,5 @@
 pipeline,hit_rate@5,mrr,full_recall@5,questions_leaking_internal,questions_using_superseded
-1. Baseline,100.0,0.972,88.9,1,2
+1. Baseline,100.0,0.972,88.9,2,2
 2. + Smart chunks + filters (vector only),100.0,1.0,83.3,0,0
 "3. + Hybrid search (BM25 + vector, RRF)",100.0,1.0,88.9,0,0
 4. + Reranker (final retrieval),100.0,0.944,88.9,0,0
